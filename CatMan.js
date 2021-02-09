@@ -1,4 +1,4 @@
-if (!Catman && mw.config.get("wgNamespaceNumber") >= 0) {
+if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsProbablyEditable")) {
     var Catman = {};
     mw.loader.using(["oojs-ui-core", "oojs-ui-windows", "oojs-ui-widgets", "oojs-ui.styles.icons-moderation", "oojs-ui.styles.icons-interactions", "oojs-ui.styles.icons-editing-core"], function () {
         Catman.start = function () {
@@ -264,7 +264,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0) {
                         });
                     }
                     if (uneditablelist.length > 0) {
-                        $("#catman-categories").append("<table style=\"width:100%\"><caption><b>Categories you cannot edit</b></caption><tbody id=\"catman-uneditable\"></tbody></table>");
+                        $("#catman-categories").append("<table style=\"width:100%\"><caption><b>Categories you cannot edit</b> (<span title=\"These categories cannot be edited with CatMan because they are automatically added with templates or magic words. To remove these categories, remove the templates or magic words that populate these categories.\" style=\"text-decoration-line:underline;text-decoration-style:dotted;\">?</span>)</caption><tbody id=\"catman-uneditable\"></tbody></table>");
                         for (var i of uneditablelist) {
                             var $el = $("<tr><td><a href=\"" + mw.config.get("wgArticlePath").replace("$1", "Category:" + i) + "\">" + i + "</a></td></tr>")
                             $("#catman-uneditable").append($el);
@@ -340,6 +340,6 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0) {
             $(document.body).append(Catman.windowManager.$element);
             Catman.windowManager.openWindow('catmandialog', { size: "full" });
         };
-        mw.util.addPortletLink('p-cactions', 'javascript:Catman.start()', 'Start CatMan', 'pt-catman');
+        mw.util.addPortletLink('p-tb', 'javascript:Catman.start()', 'Start CatMan', 'pt-catman');
     });
 }
