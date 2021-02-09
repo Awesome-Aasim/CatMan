@@ -30,6 +30,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   *
  * SOFTWARE.                                                                       *
  ***********************************************************************************/
+//<nowiki>
 if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsProbablyEditable") && mw.config.get("wgArticleId") > 0) {
     var Catman = {};
     mw.loader.using(["oojs-ui-core", "oojs-ui-windows", "oojs-ui-widgets", "oojs-ui.styles.icons-moderation", "oojs-ui.styles.icons-interactions", "oojs-ui.styles.icons-editing-core"], function () {
@@ -45,6 +46,17 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                         res.push(temp[i].split("]]")[0].slice(start = categoryname.length + 1));
                     }
                 }
+                /*
+                var catlist = mw.config.get("wgCategories");
+                var rtn = [];
+                for (var i in res) {
+                    for (var j in catlist) {
+                        if (catlist[j] == res[i]) {
+                            rtn.push(res[i]);
+                        }
+                    }
+                }
+                */
                 return res;
             }
             function CatManDialog(config) {
@@ -99,15 +111,17 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                                     for (var i in categoriestoremove) {
                                         for (var j in Catman.catprefixes) {
                                             if (wikitext.search("\\[\\[" + Catman.catprefixes[j][0].toUpperCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoremove[i] + "\\]\\]") >= 0 || wikitext.search("\\[\\[" + Catman.catprefixes[j][0].toLowerCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoremove[i] + "\\]\\]") >= 0) {
-                                                presummary += "-cat [[Category:" + categoriestoremove[i] + "|" + categoriestoremove[i] + "]]"
+                                                presummary += "-cat [[Category:" + categoriestoremove[i].split("|")[0] + "|" + categoriestoremove[i].split("|")[0] + "]]"
                                             }
                                             if (i != categoriestoremove.length - 1) {
                                                 presummary += ", "
                                             }
                                             while (wikitext.search("\\[\\[" + Catman.catprefixes[j][0].toUpperCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoremove[i] + "\\]\\]") >= 0) {
+                                                wikitext = wikitext.replace("[[" + Catman.catprefixes[j][0].toUpperCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoremove[i] + "]]\n", "");
                                                 wikitext = wikitext.replace("[[" + Catman.catprefixes[j][0].toUpperCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoremove[i] + "]]", "");
                                             }
                                             while (wikitext.search("\\[\\[" + Catman.catprefixes[j][0].toLowerCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoremove[i] + "\\]\\]") >= 0) {
+                                                wikitext = wikitext.replace("[[" + Catman.catprefixes[j][0].toLowerCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoremove[i] + "]]\n", "");
                                                 wikitext = wikitext.replace("[[" + Catman.catprefixes[j][0].toLowerCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoremove[i] + "]]", "");
                                             }
                                         }
@@ -118,7 +132,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                                     for (var i in categoriestoadd) {
                                         for (var j in Catman.catprefixes) {
                                             if (wikitext.search("\\[\\[" + Catman.catprefixes[j][0].toUpperCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoadd[i] + "\\]\\]") < 0 && wikitext.search("\\[\\[" + Catman.catprefixes[j][0].toLowerCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoadd[i] + "\\]\\]") < 0) {
-                                                presummary += "+cat [[Category:" + categoriestoadd[i] + "|" + categoriestoadd[i] + "]]"
+                                                presummary += "+cat [[Category:" + categoriestoadd[i].split("|")[0] + "|" + categoriestoadd[i].split("|")[0] + "]]"
                                             }
                                             if (i != categoriestoadd.length - 1) {
                                                 presummary += ", "
@@ -198,19 +212,10 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
             CategoriesLayout.prototype.getBodyHeight = function () {
                 return "full";
             }
-            CategoriesLayout.prototype.getBodyWidth = function () {
-                return "full";
-            }
             SummaryLayout.prototype.getBodyHeight = function () {
                 return "full";
             }
-            SummaryLayout.prototype.getBodyWidth = function () {
-                return "full";
-            }
             CatManDialog.prototype.getBodyHeight = function () {
-                return "full";
-            }
-            CatManDialog.prototype.getBodyWidth = function () {
                 return "full";
             }
             CatManDialog.prototype.initialize = function () {
@@ -277,7 +282,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                     for (var i in categorylist) {
                         var editablecategory = false;
                         for (var j in editablelist) {
-                            if (categorylist[i] == editablelist[j]) {
+                            if (categorylist[i] == editablelist[j].split("|")[0]) {
                                 editablecategory = true;
                                 break;
                             }
@@ -289,7 +294,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                     $("#catman-categories").append("<style>\n.catman-remove {\ntext-decoration:line-through;\n}</style>")
                     $("#catman-categories").append("<table style=\"width:100%\"><caption><b>Categories you can edit</b></caption><tbody id=\"catman-table\"></tbody></table>");
                     for (var i of editablelist) {
-                        var $el = $("<tr class=\"catman-category catman-currentcategory\"><td class=\"catman-categoryname\"><a href=\"" + mw.config.get("wgArticlePath").replace("$1", "Category:" + i) + "\">" + i + "</a></td><td class=\"catman-categoryremove\"></td></tr>")
+                        var $el = $("<tr class=\"catman-category catman-currentcategory\"><td class=\"catman-categoryname\"><a href=\"" + mw.config.get("wgArticlePath").replace("$1", "Category:" + i.split("|")[0]) + "\">" + i.split("|")[0] + "</a>" + (i.split("|").length > 0 ? "<span title=\"This is a category sort key, used to sort category entries when viewing the page in the category.\" style=\"text-decoration-line:underline;text-decoration-style:dotted;\">|" + i.split("|")[1] + "</span>" : "") + "</td><td class=\"catman-categoryremove\"></td></tr>")
                         $("#catman-table").append($el);
                         var removeCat = new OO.ui.ButtonWidget({
                             icon: 'trash',
@@ -321,14 +326,14 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                     if (uneditablelist.length > 0) {
                         $("#catman-categories").append("<table style=\"width:100%\"><caption><b>Categories you cannot edit</b> (<span title=\"These categories cannot be edited with CatMan because they are automatically added with templates or magic words. To remove these categories, remove the templates or magic words that populate these categories.\" style=\"text-decoration-line:underline;text-decoration-style:dotted;\">?</span>)</caption><tbody id=\"catman-uneditable\"></tbody></table>");
                         for (var i of uneditablelist) {
-                            var $el = $("<tr><td><a href=\"" + mw.config.get("wgArticlePath").replace("$1", "Category:" + i) + "\">" + i + "</a></td></tr>")
+                            var $el = $("<tr><td><a href=\"" + mw.config.get("wgArticlePath").replace("$1", "Category:" + i.split("|")[0]) + "\">" + i + "</a></td></tr>")
                             $("#catman-uneditable").append($el);
                         }
                     }
                     Catman.addCat = function (e) {
                         e.preventDefault();
                         if (catinput.getValue().length > 0) {
-                            var $el = $("<tr class=\"catman-category catman-addcategory\"><td class=\"catman-categoryname\"><a href=\"" + mw.config.get("wgArticlePath").replace("$1", "Category:" + catinput.getValue()) + "\">" + catinput.getValue() + "</a></td><td class=\"catman-categoryremove\"></td></tr>")
+                            var $el = $("<tr class=\"catman-category catman-addcategory\"><td class=\"catman-categoryname\"><a href=\"" + mw.config.get("wgArticlePath").replace("$1", "Category:" + catinput.getValue().split("|")[0]) + "\">" + catinput.getValue().split("|")[0] + "</a>" + (catinput.getValue().split("|").length > 0 ? "<span title=\"This is a category sort key, used to sort category entries when viewing the page in the category.\" style=\"text-decoration-line:underline;text-decoration-style:dotted;\">|" + catinput.getValue().split("|")[1] + "</span>" : "") + "</td><td class=\"catman-categoryremove\"></td></tr>")
                             $("#catman-table").append($el);
                             var removeCat = new OO.ui.ButtonWidget({
                                 icon: 'trash',
@@ -360,25 +365,44 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                     catinput.$element.keypress(function(e) {
                         if (e.which == 13) {
                             Catman.addCat(e);
+                        } else {
+                            var key = e.which || e.keyCode;
+                            if (key == 91 || key == 93 || (catinput.getValue() == "" && key == 32) || (catinput.getValue().search("\\|") >= 0 && key == 124) || (catinput.getValue() == "" && key == 124) || key == 35 || key == 123 || key == 125 || key == 60 || key == 62) { // stop the input of forbidden wikitext characters (except for pipe which is used for category sorting)
+                                e.preventDefault();
+                            }
                         }
                     });
                     window.setInterval(function(e) {
                         //populate the combobox
+                        var searchterm = catinput.getValue();
+                        var splitsearch = searchterm.split("|");
                         $.get(mw.config.get("wgScriptPath") + "/api.php", {
                             "action": "query",
                             "format": "json",
                             "list": "search",
                             "utf8": 1,
-                            "srsearch": catinput.getValue(),
+                            "srsearch": splitsearch[0],
                             "srnamespace": "14"
                         }).then(function(result, status) {
                             if (status == "success") {
                                 if (result.error) {
-                                    catinput.setoptions([]);
+                                    catinput.setOptions([]);
                                 } else {
                                     var options = [], searchresults = result.query.search;
+                                    var restofsearchterm = "";
+                                    for (var i in splitsearch) {
+                                        if (i != 0) {
+                                            restofsearchterm += splitsearch[i];
+                                        }
+                                        if (i != splitsearch.length - 1) {
+                                            restofsearchterm += "|";
+                                        }
+                                    }
                                     for (var i in searchresults) {
-                                        options.push({data: searchresults[i].title.split(":")[1], label: searchresults[i].title.split(":")[1]});
+                                        options.push({data: searchresults[i].title.split(":")[1] + restofsearchterm, label: searchresults[i].title.split(":")[1]});
+                                    }
+                                    if (options.length == 0) {
+                                        options.push({data: searchterm, label: "No results found."})
                                     }
                                     catinput.setOptions(options);
                                 }
@@ -421,3 +445,4 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
         }
     });
 }
+//</nowiki>
