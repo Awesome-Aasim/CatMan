@@ -377,7 +377,6 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                                     catinput.setoptions([]);
                                 } else {
                                     var options = [], searchresults = result.query.search;
-                                    options.push({data: catinput.getValue(), label: catinput.getValue()});
                                     for (var i in searchresults) {
                                         options.push({data: searchresults[i].title.split(":")[1], label: searchresults[i].title.split(":")[1]});
                                     }
