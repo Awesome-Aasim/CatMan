@@ -69,12 +69,14 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                 {
                     flags: ['primary', 'progressive'],
                     icon: 'check',
+                    title: 'Save changes',
                     action: 'next',
                     disabled: false
                 },
                 {
                     flags: 'safe',
                     icon: 'close',
+                    title: 'Cancel',
                     action: 'back',
                     disabled: false
                 }
@@ -94,7 +96,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                                     categoriestoremove.push($(this).find(".catman-categoryname").text());
                                 });
                                 summary = Catman.esinput.getValue();
-                                presummary = "[[wikipedia:User:Awesome Aasim/CatMan|CatMan]]: "
+                                presummary = "Run [[w:en:User:Awesome Aasim/CatMan|CatMan]]" + (summary ? " (reason: " + summary + ")" : "") + ": ";
                                 if (categoriestoadd.length == 0 && categoriestoremove.length == 0) {
                                     throw new OO.ui.Error("No categories to add or remove.", { warning: true, recoverable: true });
                                 }
@@ -142,9 +144,6 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                                                 break;
                                             }
                                         }
-                                    }
-                                    if (summary) {
-                                        presummary += " (reason: " + summary + ")"
                                     }
                                     return $.get(mw.config.get("wgScriptPath") + "/api.php", {
                                         action: "query",
@@ -222,7 +221,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                 CatManDialog.super.prototype.initialize.call(this);
                 this.content = new OO.ui.PanelLayout({ padded: false, expanded: false, $overlay: this.$overlay });
                 var catinput = new OO.ui.ComboBoxInputWidget({ expanded: false, padded: true, placeholder: "Enter category name", options: [], $overlay: this.$overlay });
-                var catinputsubmit = new OO.ui.ButtonWidget({ flags: ["primary", "progressive"], icon: "add", $overlay: this.$overlay })
+                var catinputsubmit = new OO.ui.ButtonWidget({ flags: ["primary", "progressive"], icon: "add", title: 'Add category', $overlay: this.$overlay })
                 var esinput = new OO.ui.TextInputWidget({ placeholder: "Edit summary", $overlay: this.$overlay });
                 var catpage = new CategoriesLayout('categories', { expanded: false, $overlay: this.$overlay });
                 var sumpage = new SummaryLayout('summary', { expanded: false, $overlay: this.$overlay });
@@ -298,6 +297,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                         $("#catman-table").append($el);
                         var removeCat = new OO.ui.ButtonWidget({
                             icon: 'trash',
+                            title: 'Remove category',
                             flags: 'destructive',
                             $overlay: Catman.$overlay,
                             classes: ['catman-categoryremovebutton']
@@ -311,6 +311,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                         });
                         var undoCat = new OO.ui.ButtonWidget({
                             icon: 'undo',
+                            title: 'Undo remove',
                             $overlay: Catman.$overlay,
                             classes: ['catman-undobutton']
                         });
@@ -326,7 +327,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                     if (uneditablelist.length > 0) {
                         $("#catman-categories").append("<table style=\"width:100%\"><caption><b>Categories you cannot edit</b> (<span title=\"These categories cannot be edited with CatMan because they are automatically added with templates or magic words. To remove these categories, remove the templates or magic words that populate these categories.\" style=\"text-decoration-line:underline;text-decoration-style:dotted;\">?</span>)</caption><tbody id=\"catman-uneditable\"></tbody></table>");
                         for (var i of uneditablelist) {
-                            var $el = $("<tr><td><a href=\"" + mw.config.get("wgArticlePath").replace("$1", "Category:" + i.split("|")[0]) + "\">" + i + "</a></td></tr>")
+                            var $el = $("<tr><td class=\"catman-categoryname\"><a href=\"" + mw.config.get("wgArticlePath").replace("$1", "Category:" + i.split("|")[0]) + "\">" + i + "</a></td></tr>")
                             $("#catman-uneditable").append($el);
                         }
                     }
@@ -337,6 +338,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                             $("#catman-table").append($el);
                             var removeCat = new OO.ui.ButtonWidget({
                                 icon: 'trash',
+                                title: 'Remove category',
                                 flags: 'destructive',
                                 $overlay: Catman.$overlay
                             });
@@ -352,7 +354,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                             $.get(mw.config.get("wgScriptPath") + "/api.php", {
                                 action: "parse",
                                 format: "json",
-                                page: "Category:" + $(this).text()
+                                page: "Category:" + $(this).text().split("|")[0]
                             }).done(function(result) {
                                 if (result.error) {
                                     if (result.error.code == "missingtitle") {
