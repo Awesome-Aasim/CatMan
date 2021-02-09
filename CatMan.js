@@ -1,6 +1,6 @@
 /***********************************************************************************
  * CatMan:  The category manager for MediaWiki wikis that is simple, lightweight,  *
- * and modern.                                                                     *
+ * and modern.  Nya nya.                                                           *
  *                                                                                 *
  * This script is largely a work in progress and may sometimes not work properly.  *
  * Please see the English Wikipedia for known problems that are currently being    *
