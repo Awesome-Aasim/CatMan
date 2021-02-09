@@ -198,12 +198,21 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
             CategoriesLayout.prototype.getBodyHeight = function () {
                 return "full";
             }
+            CategoriesLayout.prototype.getBodyWidth = function () {
+                return "full";
+            }
             SummaryLayout.prototype.getBodyHeight = function () {
+                return "full";
+            }
+            SummaryLayout.prototype.getBodyWidth = function () {
                 return "full";
             }
             CatManDialog.prototype.getBodyHeight = function () {
                 return "full";
-            };
+            }
+            CatManDialog.prototype.getBodyWidth = function () {
+                return "full";
+            }
             CatManDialog.prototype.initialize = function () {
                 CatManDialog.super.prototype.initialize.call(this);
                 this.content = new OO.ui.PanelLayout({ padded: false, expanded: false });
