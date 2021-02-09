@@ -294,7 +294,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                     $("#catman-categories").append("<style>\n.catman-remove {\ntext-decoration:line-through;\n}</style>")
                     $("#catman-categories").append("<table style=\"width:100%\"><caption><b>Categories you can edit</b></caption><tbody id=\"catman-table\"></tbody></table>");
                     for (var i of editablelist) {
-                        var $el = $("<tr class=\"catman-category catman-currentcategory\"><td class=\"catman-categoryname\"><a href=\"" + mw.config.get("wgArticlePath").replace("$1", "Category:" + i.split("|")[0]) + "\">" + i.split("|")[0] + "</a>" + (i.split("|").length > 0 ? "<span title=\"This is a category sort key, used to sort category entries when viewing the page in the category.\" style=\"text-decoration-line:underline;text-decoration-style:dotted;\">|" + i.split("|")[1] + "</span>" : "") + "</td><td class=\"catman-categoryremove\"></td></tr>")
+                        var $el = $("<tr class=\"catman-category catman-currentcategory\"><td class=\"catman-categoryname\"><a href=\"" + mw.config.get("wgArticlePath").replace("$1", "Category:" + i.split("|")[0]) + "\">" + i.split("|")[0] + "</a>" + (i.split("|").length > 1 ? "<span title=\"This is a category sort key, used to sort category entries when viewing the page in the category.\" style=\"text-decoration-line:underline;text-decoration-style:dotted;\">|" + i.split("|")[1] + "</span>" : "") + "</td><td class=\"catman-categoryremove\"></td></tr>")
                         $("#catman-table").append($el);
                         var removeCat = new OO.ui.ButtonWidget({
                             icon: 'trash',
@@ -333,7 +333,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                     Catman.addCat = function (e) {
                         e.preventDefault();
                         if (catinput.getValue().length > 0) {
-                            var $el = $("<tr class=\"catman-category catman-addcategory\"><td class=\"catman-categoryname\"><a href=\"" + mw.config.get("wgArticlePath").replace("$1", "Category:" + catinput.getValue().split("|")[0]) + "\">" + catinput.getValue().split("|")[0] + "</a>" + (catinput.getValue().split("|").length > 0 ? "<span title=\"This is a category sort key, used to sort category entries when viewing the page in the category.\" style=\"text-decoration-line:underline;text-decoration-style:dotted;\">|" + catinput.getValue().split("|")[1] + "</span>" : "") + "</td><td class=\"catman-categoryremove\"></td></tr>")
+                            var $el = $("<tr class=\"catman-category catman-addcategory\"><td class=\"catman-categoryname\"><a href=\"" + mw.config.get("wgArticlePath").replace("$1", "Category:" + catinput.getValue().split("|")[0]) + "\">" + catinput.getValue().split("|")[0] + "</a>" + (catinput.getValue().split("|").length > 1 ? "<span title=\"This is a category sort key, used to sort category entries when viewing the page in the category.\" style=\"text-decoration-line:underline;text-decoration-style:dotted;\">|" + catinput.getValue().split("|")[1] + "</span>" : "") + "</td><td class=\"catman-categoryremove\"></td></tr>")
                             $("#catman-table").append($el);
                             var removeCat = new OO.ui.ButtonWidget({
                                 icon: 'trash',
