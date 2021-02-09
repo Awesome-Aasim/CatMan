@@ -215,26 +215,27 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
             }
             CatManDialog.prototype.initialize = function () {
                 CatManDialog.super.prototype.initialize.call(this);
-                this.content = new OO.ui.PanelLayout({ padded: false, expanded: false });
-                var catinput = new OO.ui.TextInputWidget({ placeholder: "Enter category name" });
-                var catinputsubmit = new OO.ui.ButtonWidget({ flags: ["primary", "progressive"], icon: "add" })
-                var esinput = new OO.ui.TextInputWidget({ placeholder: "Edit summary" });
-                var catpage = new CategoriesLayout('categories', { expanded: false });
-                var sumpage = new SummaryLayout('summary', { expanded: false });
-                var index = new OO.ui.IndexLayout({ expanded: true });
+                this.content = new OO.ui.PanelLayout({ padded: false, expanded: false, $overlay: this.$overlay });
+                var catinput = new OO.ui.ComboBoxInputWidget({ expanded: false, padded: true, placeholder: "Enter category name", options: [], $overlay: this.$overlay });
+                var catinputsubmit = new OO.ui.ButtonWidget({ flags: ["primary", "progressive"], icon: "add", $overlay: this.$overlay })
+                var esinput = new OO.ui.TextInputWidget({ placeholder: "Edit summary", $overlay: this.$overlay });
+                var catpage = new CategoriesLayout('categories', { expanded: false, $overlay: this.$overlay });
+                var sumpage = new SummaryLayout('summary', { expanded: false, $overlay: this.$overlay });
+                var index = new OO.ui.IndexLayout({ expanded: true, $overlay: this.$overlay });
                 index.addTabPanels([catpage, sumpage]);
                 this.content.$element.append('<span id="catman-loading"><p></p></span><span id="catman"></span>');
                 this.$body.append(this.content.$element);
                 var progressBar = new OO.ui.ProgressBarWidget( {
                     progress: false,
-                    padded: true
+                    padded: true, 
+                    $overlay: this.$overlay
                 });
                 $("#catman-loading").find("p").html(progressBar.$element);
                 $("#catman").hide();
                 $("#catman").html(index.$element);
-                var catinputset = new OO.ui.FieldsetLayout();
+                var catinputset = new OO.ui.FieldsetLayout({$overlay: this.$overlay});
                 catinputset.addItems([
-                    new OO.ui.ActionFieldLayout(catinput, catinputsubmit)
+                    new OO.ui.ActionFieldLayout(catinput, catinputsubmit, {$overlay: this.$overlay})
                 ]);
                 $("#catman-categories").append(catinputset.$element);
                 $("#catman-summary").append(esinput.$element);
@@ -246,6 +247,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                 Catman.sumpage = sumpage;
                 Catman.index = index;
                 Catman.catinputset = catinputset;
+                Catman.$overlay = this.$overlay;
                 $.get(mw.config.get("wgScriptPath") + "/api.php", {
                     action: "parse",
                     format: "json",
@@ -291,18 +293,30 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                         $("#catman-table").append($el);
                         var removeCat = new OO.ui.ButtonWidget({
                             icon: 'trash',
-                            flags: 'destructive'
+                            flags: 'destructive',
+                            $overlay: Catman.$overlay,
+                            classes: ['catman-categoryremovebutton']
                         });
                         $el.find(".catman-categoryremove").append(removeCat.$element);
                         removeCat.$element.click(function (e) {
                             e.preventDefault();
-                            if ($(this).parent().parent().hasClass("catman-currentcategory")) {
-                                $(this).parent().parent().addClass("catman-remove");
-                                $(this).hide();
-                            } else {
-                                $(this).parent().parent().remove();
-                            }
+                            $(this).parent().parent().addClass("catman-remove");
+                            $(this).parent().parent().find(".catman-undobutton").show();
+                            $(this).hide();
                         });
+                        var undoCat = new OO.ui.ButtonWidget({
+                            icon: 'undo',
+                            $overlay: Catman.$overlay,
+                            classes: ['catman-undobutton']
+                        });
+                        $el.find(".catman-categoryremove").append(undoCat.$element);
+                        undoCat.$element.click(function (e) {
+                            e.preventDefault();
+                            $(this).parent().parent().removeClass("catman-remove");
+                            $(this).parent().parent().find(".catman-categoryremovebutton").show();
+                            $(this).hide();
+                        });
+                        undoCat.$element.hide();
                     }
                     if (uneditablelist.length > 0) {
                         $("#catman-categories").append("<table style=\"width:100%\"><caption><b>Categories you cannot edit</b> (<span title=\"These categories cannot be edited with CatMan because they are automatically added with templates or magic words. To remove these categories, remove the templates or magic words that populate these categories.\" style=\"text-decoration-line:underline;text-decoration-style:dotted;\">?</span>)</caption><tbody id=\"catman-uneditable\"></tbody></table>");
@@ -318,17 +332,13 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                             $("#catman-table").append($el);
                             var removeCat = new OO.ui.ButtonWidget({
                                 icon: 'trash',
-                                flags: 'destructive'
+                                flags: 'destructive',
+                                $overlay: Catman.$overlay
                             });
                             $el.find(".catman-categoryremove").append(removeCat.$element);
                             removeCat.$element.click(function (e) {
                                 e.preventDefault();
-                                if ($(this).parent().parent().hasClass("catman-currentcategory")) {
-                                    $(this).parent().parent().addClass("catman-remove");
-                                    $(this).hide();
-                                } else {
-                                    $(this).parent().parent().remove();
-                                }
+                                $(this).parent().parent().remove();
                             });
                             catinput.setValue("");
                         }
@@ -352,6 +362,30 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                             Catman.addCat(e);
                         }
                     });
+                    window.setInterval(function(e) {
+                        //populate the combobox
+                        $.get(mw.config.get("wgScriptPath") + "/api.php", {
+                            "action": "query",
+                            "format": "json",
+                            "list": "search",
+                            "utf8": 1,
+                            "srsearch": catinput.getValue(),
+                            "srnamespace": "14"
+                        }).then(function(result, status) {
+                            if (status == "success") {
+                                if (result.error) {
+                                    catinput.setoptions([]);
+                                } else {
+                                    var options = [], searchresults = result.query.search;
+                                    options.push({data: catinput.getValue(), label: catinput.getValue()});
+                                    for (var i in searchresults) {
+                                        options.push({data: searchresults[i].title.split(":")[1], label: searchresults[i].title.split(":")[1]});
+                                    }
+                                    catinput.setOptions(options);
+                                }
+                            }
+                        })
+                    }, 1000);
                     catinputsubmit.$element.click(Catman.addCat);
                     $(".catman-categoryname").each(function() {
                         var that = this;
