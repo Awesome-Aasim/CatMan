@@ -381,6 +381,10 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
             $(document.body).append(Catman.windowManager.$element);
             Catman.windowManager.openWindow('catmandialog', { size: "full" });
         };
-        mw.util.addPortletLink('p-tb', 'javascript:Catman.start()', 'Start CatMan', 'pt-catman');
+        if (mw.config.get("skin") == "minerva") {
+            mw.util.addPortletLink('p-tb', 'javascript:Catman.start()', 'Start CatMan', 'pt-catman');
+        } else {
+            mw.util.addPortletLink('p-cactions', 'javascript:Catman.start()', 'Start CatMan', 'pt-catman');
+        }
     });
 }
