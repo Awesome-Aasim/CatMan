@@ -31,7 +31,7 @@
  * SOFTWARE.                                                                       *
  ***********************************************************************************/
 //<nowiki>
-if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsProbablyEditable") && mw.config.get("wgArticleId") > 0) {
+if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsProbablyEditable") && mw.config.get("wgArticleId") > 0 && mw.config.get("wgNamespaceNumber") != 10) {
     var Catman = {};
     mw.loader.using(["oojs-ui-core", "oojs-ui-windows", "oojs-ui-widgets", "oojs-ui.styles.icons-moderation", "oojs-ui.styles.icons-interactions", "oojs-ui.styles.icons-editing-core"], function () {
         Catman.start = function () {
@@ -43,7 +43,8 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                 var res = []
                 for (var i in temp) {
                     if (temp[i].startsWith(categoryname + ":")) {
-                        res.push(temp[i].split("]]")[0].slice(start = categoryname.length + 1));
+                        var temp2 = temp[i].split("]]")[0].slice(start = categoryname.length + 1);
+                        res.push(temp2[0].toUpperCase() + temp2.substring(1));
                     }
                 }
                 /*
