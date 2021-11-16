@@ -108,9 +108,10 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                                     prop: "wikitext"
                                 }).then(function (result, status) {
                                     if (status != 'success') {
-                                        throw new OO.ui.Error("Connection failed. Please check your Internet and try again.", {recoverable: true});
+                                        throw new OO.ui.Error("Connection failed. Please check your Internet and try again.", { recoverable: true });
                                     }
                                     wikitext = result.parse.wikitext["*"];
+                                    debugger;
                                     for (var i in categoriestoremove) {
                                         for (var j in Catman.catprefixes) {
                                             if (wikitext.search("\\[\\[" + Catman.catprefixes[j][0].toUpperCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoremove[i] + "\\]\\]") >= 0 || wikitext.search("\\[\\[" + Catman.catprefixes[j][0].toLowerCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoremove[i] + "\\]\\]") >= 0) {
@@ -133,17 +134,15 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                                         presummary += "; "
                                     }
                                     for (var i in categoriestoadd) {
-                                        for (var j in Catman.catprefixes) {
-                                            if (wikitext.search("\\[\\[" + Catman.catprefixes[j][0].toUpperCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoadd[i] + "\\]\\]") < 0 && wikitext.search("\\[\\[" + Catman.catprefixes[j][0].toLowerCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoadd[i] + "\\]\\]") < 0) {
-                                                presummary += "+cat [[Category:" + categoriestoadd[i].split("|")[0] + "|" + categoriestoadd[i].split("|")[0] + "]]"
-                                            }
-                                            if (i != categoriestoadd.length - 1) {
-                                                presummary += ", "
-                                            }
-                                            while (wikitext.search("\\[\\[" + Catman.catprefixes[j][0].toUpperCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoadd[i] + "\\]\\]") < 0 && wikitext.search("\\[\\[" + Catman.catprefixes[j][0].toLowerCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoadd[i] + "\\]\\]") < 0) {
-                                                wikitext += "\n[[" + Catman.catprefixes[j][0].toUpperCase() + Catman.catprefixes[j].slice(start = 1) + ":" + categoriestoadd[i] + "]]";
-                                                break;
-                                            }
+                                        if (wikitext.search("\\[\\[" + mw.config.get("wgFormattedNamespaces")[14] + ":" + categoriestoadd[i] + "\\]\\]") < 0 && wikitext.search("\\[\\[" + mw.config.get("wgFormattedNamespaces")[14] + ":" + categoriestoadd[i] + "\\]\\]") < 0) {
+                                            presummary += "+cat [[Category:" + categoriestoadd[i].split("|")[0] + "|" + categoriestoadd[i].split("|")[0] + "]]";
+                                        }
+                                        if (i != categoriestoadd.length - 1) {
+                                            presummary += ", ";
+                                        }
+                                        while (wikitext.search("\\[\\[" + mw.config.get("wgFormattedNamespaces")[14] + ":" + categoriestoadd[i] + "\\]\\]") < 0 && wikitext.search("\\[\\[" + mw.config.get("wgFormattedNamespaces")[14] + ":" + categoriestoadd[i] + "\\]\\]") < 0) {
+                                            wikitext += "\n[[" + mw.config.get("wgFormattedNamespaces")[14] + ":" + categoriestoadd[i] + "]]";
+                                            break;
                                         }
                                     }
                                     return $.get(mw.config.get("wgScriptPath") + "/api.php", {
@@ -153,7 +152,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                                         type: "csrf"
                                     }).then(function (result, status) {
                                         if (status != 'success') {
-                                            throw new OO.ui.Error("Connection failed. Please check your Internet and try again.", {recoverable: true});
+                                            throw new OO.ui.Error("Connection failed. Please check your Internet and try again.", { recoverable: true });
                                         }
                                         if (result.error) {
                                             throw new OO.ui.Error(result.error.info, { recoverable: true });
@@ -167,7 +166,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                                                 summary: presummary
                                             }).then(function (result, status) {
                                                 if (status != 'success') {
-                                                    throw new OO.ui.Error("Connection failed. Please check your Internet and try again.", {recoverable: true});
+                                                    throw new OO.ui.Error("Connection failed. Please check your Internet and try again.", { recoverable: true });
                                                 }
                                                 if (result.error) {
                                                     throw new OO.ui.Error(result.error.info, { recoverable: true });
@@ -230,17 +229,17 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                 index.addTabPanels([catpage, sumpage]);
                 this.content.$element.append('<span id="catman-loading"><p></p></span><span id="catman"></span>');
                 this.$body.append(this.content.$element);
-                var progressBar = new OO.ui.ProgressBarWidget( {
+                var progressBar = new OO.ui.ProgressBarWidget({
                     progress: false,
-                    padded: true, 
+                    padded: true,
                     $overlay: this.$overlay
                 });
                 $("#catman-loading").find("p").html(progressBar.$element);
                 $("#catman").hide();
                 $("#catman").html(index.$element);
-                var catinputset = new OO.ui.FieldsetLayout({$overlay: this.$overlay});
+                var catinputset = new OO.ui.FieldsetLayout({ $overlay: this.$overlay });
                 catinputset.addItems([
-                    new OO.ui.ActionFieldLayout(catinput, catinputsubmit, {$overlay: this.$overlay})
+                    new OO.ui.ActionFieldLayout(catinput, catinputsubmit, { $overlay: this.$overlay })
                 ]);
                 $("#catman-categories").append(catinputset.$element);
                 $("#catman-summary").append(esinput.$element);
@@ -350,13 +349,13 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                             });
                             catinput.setValue("");
                         }
-                        $(".catman-categoryname").each(function() {
+                        $(".catman-categoryname").each(function () {
                             var that = this;
                             $.get(mw.config.get("wgScriptPath") + "/api.php", {
                                 action: "parse",
                                 format: "json",
                                 page: "Category:" + $(this).text().split("|")[0]
-                            }).done(function(result) {
+                            }).done(function (result) {
                                 if (result.error) {
                                     if (result.error.code == "missingtitle") {
                                         $(that).find("a").addClass("new");
@@ -365,7 +364,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                             });
                         });
                     }
-                    catinput.$element.keypress(function(e) {
+                    catinput.$element.keypress(function (e) {
                         if (e.which == 13) {
                             Catman.addCat(e);
                         } else {
@@ -375,7 +374,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                             }
                         }
                     });
-                    window.setInterval(function(e) {
+                    window.setInterval(function (e) {
                         //populate the combobox
                         var searchterm = catinput.getValue();
                         var splitsearch = searchterm.split("|");
@@ -386,7 +385,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                             "utf8": 1,
                             "srsearch": splitsearch[0],
                             "srnamespace": "14"
-                        }).then(function(result, status) {
+                        }).then(function (result, status) {
                             if (status == "success") {
                                 if (result.error) {
                                     catinput.setOptions([]);
@@ -402,10 +401,10 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                                         }
                                     }
                                     for (var i in searchresults) {
-                                        options.push({data: searchresults[i].title.split(":")[1] + restofsearchterm, label: searchresults[i].title.split(":")[1]});
+                                        options.push({ data: searchresults[i].title.split(":")[1] + restofsearchterm, label: searchresults[i].title.split(":")[1] });
                                     }
                                     if (options.length == 0) {
-                                        options.push({data: searchterm, label: "No results found."})
+                                        options.push({ data: searchterm, label: "No results found." })
                                     }
                                     catinput.setOptions(options);
                                 }
@@ -413,13 +412,13 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                         })
                     }, 1000);
                     catinputsubmit.$element.click(Catman.addCat);
-                    $(".catman-categoryname").each(function() {
+                    $(".catman-categoryname").each(function () {
                         var that = this;
                         $.get(mw.config.get("wgScriptPath") + "/api.php", {
                             action: "parse",
                             format: "json",
                             page: "Category:" + $(this).text()
-                        }).done(function(result) {
+                        }).done(function (result) {
                             if (result.error) {
                                 if (result.error.code == "missingtitle") {
                                     $(that).find("a").addClass("new");
