@@ -82,7 +82,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                     disabled: false
                 }
             ]
-            CatManDialog.prototype.getActionProcess = async function (action) {
+            CatManDialog.prototype.getActionProcess = function (action) {
                 var categoriestoadd, categoriestoremove, summary, presummary, wikitext;
                 switch (action) {
                     case 'next':
