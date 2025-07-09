@@ -364,47 +364,48 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                             });
                         });
                     }
-                    catinput.$element.keypress(async function (e) {
+                    catinput.$element.keypress(function (e) {
                         if (e.which == 13) {
                             Catman.addCat(e);
                         } else {
                             var key = e.which || e.keyCode;
                             if (key == 91 || key == 93 || (catinput.getValue() == "" && key == 32) || (catinput.getValue().search("\\|") >= 0 && key == 124) || (catinput.getValue() == "" && key == 124) || key == 35 || key == 123 || key == 125 || key == 60 || key == 62) { // stop the input of forbidden wikitext characters (except for pipe which is used for category sorting)
                                 e.preventDefault();
-                            } else {
-                                //populate the combobox
-                                var searchterm = catinput.getValue();
-                                var splitsearch = searchterm.split("|");
-                                var result = await $.get(mw.config.get("wgScriptPath") + "/api.php", {
-                                    "action": "query",
-                                    "format": "json",
-                                    "list": "search",
-                                    "utf8": 1,
-                                    "srsearch": splitsearch[0],
-                                    "srnamespace": "14"
-                                })
-                                if (result.error) {
-                                    catinput.setOptions([]);
-                                } else {
-                                    var options = [], searchresults = result.query.search;
-                                    var restofsearchterm = "";
-                                    for (var i in splitsearch) {
-                                        if (i != 0) {
-                                            restofsearchterm += splitsearch[i];
-                                        }
-                                        if (i != splitsearch.length - 1) {
-                                            restofsearchterm += "|";
-                                        }
-                                    }
-                                    for (var i in searchresults) {
-                                        options.push({ data: searchresults[i].title.split(":")[1] + restofsearchterm, label: searchresults[i].title.split(":")[1] });
-                                    }
-                                    if (options.length == 0) {
-                                        options.push({ data: searchterm, label: "No results found." })
-                                    }
-                                    catinput.setOptions(options);
+                            }
+                        }
+                    });
+                    catinput.on("change", async function(text) {
+                        //populate the combobox
+                        var searchterm = catinput.getValue();
+                        var splitsearch = searchterm.split("|");
+                        var result = await $.get(mw.config.get("wgScriptPath") + "/api.php", {
+                            "action": "query",
+                            "format": "json",
+                            "list": "search",
+                            "utf8": 1,
+                            "srsearch": splitsearch[0],
+                            "srnamespace": "14"
+                        })
+                        if (result.error) {
+                            catinput.setOptions([]);
+                        } else {
+                            var options = [], searchresults = result.query.search;
+                            var restofsearchterm = "";
+                            for (var i in splitsearch) {
+                                if (i != 0) {
+                                    restofsearchterm += splitsearch[i];
+                                }
+                                if (i != splitsearch.length - 1) {
+                                    restofsearchterm += "|";
                                 }
                             }
+                            for (var i in searchresults) {
+                                options.push({ data: searchresults[i].title.split(":")[1] + restofsearchterm, label: searchresults[i].title.split(":")[1] });
+                            }
+                            if (options.length == 0) {
+                                options.push({ data: searchterm, label: "No results found." })
+                            }
+                            catinput.setOptions(options);
                         }
                     });
                     catinputsubmit.$element.click(Catman.addCat);
