@@ -33,8 +33,8 @@
 //<nowiki>
 if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsProbablyEditable") && mw.config.get("wgArticleId") > 0 && mw.config.get("wgNamespaceNumber") != 10) {
     var Catman = {};
-    mw.loader.using(["oojs-ui-core", "oojs-ui-windows", "oojs-ui-widgets", "oojs-ui.styles.icons-moderation", "oojs-ui.styles.icons-interactions", "oojs-ui.styles.icons-editing-core"], function () {
-        Catman.start = function () {
+    mw.loader.using(["oojs-ui-core", "oojs-ui-windows", "oojs-ui-widgets", "oojs-ui.styles.icons-moderation", "oojs-ui.styles.icons-interactions", "oojs-ui.styles.icons-editing-core"], async function () {
+        Catman.start = async function () {
             // Create a factory.
             Catman.factory = new OO.Factory();
             Catman.getEditableCategories = function (text, categoryname = "Category") {
@@ -82,7 +82,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                     disabled: false
                 }
             ]
-            CatManDialog.prototype.getActionProcess = function (action) {
+            CatManDialog.prototype.getActionProcess = async function (action) {
                 var categoriestoadd, categoriestoremove, summary, presummary, wikitext;
                 switch (action) {
                     case 'next':
@@ -257,7 +257,7 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                     format: "json",
                     page: mw.config.get("wgPageName"),
                     prop: "wikitext"
-                }).then(function (result, status) {
+                }).then(async function (result, status) {
                     if (status != "success") {
                         Catman.windowManager.closeWindow('catmandialog');
                         Catman.windowManager.$element.remove();
@@ -364,29 +364,25 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                             });
                         });
                     }
-                    catinput.$element.keypress(function (e) {
+                    catinput.$element.keypress(async function (e) {
                         if (e.which == 13) {
                             Catman.addCat(e);
                         } else {
                             var key = e.which || e.keyCode;
                             if (key == 91 || key == 93 || (catinput.getValue() == "" && key == 32) || (catinput.getValue().search("\\|") >= 0 && key == 124) || (catinput.getValue() == "" && key == 124) || key == 35 || key == 123 || key == 125 || key == 60 || key == 62) { // stop the input of forbidden wikitext characters (except for pipe which is used for category sorting)
                                 e.preventDefault();
-                            }
-                        }
-                    });
-                    window.setInterval(function (e) {
-                        //populate the combobox
-                        var searchterm = catinput.getValue();
-                        var splitsearch = searchterm.split("|");
-                        $.get(mw.config.get("wgScriptPath") + "/api.php", {
-                            "action": "query",
-                            "format": "json",
-                            "list": "search",
-                            "utf8": 1,
-                            "srsearch": splitsearch[0],
-                            "srnamespace": "14"
-                        }).then(function (result, status) {
-                            if (status == "success") {
+                            } else {
+                                //populate the combobox
+                                var searchterm = catinput.getValue();
+                                var splitsearch = searchterm.split("|");
+                                var result = await $.get(mw.config.get("wgScriptPath") + "/api.php", {
+                                    "action": "query",
+                                    "format": "json",
+                                    "list": "search",
+                                    "utf8": 1,
+                                    "srsearch": splitsearch[0],
+                                    "srnamespace": "14"
+                                })
                                 if (result.error) {
                                     catinput.setOptions([]);
                                 } else {
@@ -409,8 +405,8 @@ if (!Catman && mw.config.get("wgNamespaceNumber") >= 0 && mw.config.get("wgIsPro
                                     catinput.setOptions(options);
                                 }
                             }
-                        })
-                    }, 1000);
+                        }
+                    });
                     catinputsubmit.$element.click(Catman.addCat);
                     $(".catman-categoryname").each(function () {
                         var that = this;
